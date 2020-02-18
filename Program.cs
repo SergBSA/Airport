@@ -31,18 +31,18 @@ namespace Airport
                 ozhydanie,
                 zaderzhka
             }
-            
+
 
             DateTime startTime = new DateTime(2015, 12, 12);
             private string destination;
-            private int number;
+            private int flynumber;
             private DateTime timeArrival;
             private string aviakompany;
             private int terminal;
             private int gate;
             private int serialNumber;
 
-            
+
             public string Destination
             {
                 get { return destination; }
@@ -53,10 +53,10 @@ namespace Airport
                 get { return serialNumber; }
                 set { serialNumber = value; }
             }
-            public int Number
+            public int FlyNumber
             {
-                get { return number; }
-                set { this.number = value;}
+                get { return flynumber; }
+                set { this.flynumber = value; }
             }
             public DateTime TimeArrival
             {
@@ -78,32 +78,62 @@ namespace Airport
                 get { return gate; }
                 set { gate = value; }
             }
-          
+
         };
-     
-        private static int CheckInput(string str = "Введите доступный пункт")
+        class Person : Airplane 
         {
-            int Punkt;
-            while (!int.TryParse(Console.ReadLine(), out Punkt))
+            
+        }
+
+        private static int CheckInput(string str = "Insert Correct Password")
+        {
+            int Paragraph;
+            while (!int.TryParse(Console.ReadLine(), out Paragraph))
             {
                 Console.Clear();
                 Console.WriteLine(str);
             }
-            return Punkt;
+            return Paragraph;
+        }
+        private static DateTime CheckInputDateTime(string str = "Incorect Date")
+        {
+            DateTime Paragraph;
+            while (!DateTime.TryParse(Console.ReadLine(), out Paragraph))
+            {
+                Console.Clear();
+                Console.WriteLine(str);
+            }
+            return Paragraph;
+        }
+        private static string CheckAdminPass(string str = "Insert Correct Password")
+        {
+            string pass = "1234";
+            string input = Console.ReadLine();
+            while (input != pass)
+            {
+                Console.Clear();
+                Console.WriteLine(str);
+                input = Console.ReadLine();
+            }
+            return input;
         }
         enum ParagraphPassword
-        { 
-            Admin = 1,
-            User = 2
+        {
+            AdminPass = 1,
+            UserPass = 2
         }
         enum AdminAction
         {
-            ChangeInformation = 1,
-            DeleteFlight = 2,
-            InsertNewFlight 3
+            Modify = 1,
+            Delete = 2,
+            Add = 3
         }
-        
-        // Не понятно, как вызывать этот Енам в коде... Мне нужно выбрать из 3 значений: 1-изменить/2-удалить/3-ввести новый
+        enum UserAction
+        {
+            NumSearch = 1,
+            DateSearch = 2,
+            GateSearch = 3
+        }
         private static TEnum GetUserInput<TEnum>() where TEnum : struct, Enum
         {
             string userInputString = Console.ReadLine();
@@ -114,18 +144,23 @@ namespace Airport
             }
             throw new ArgumentException("Wrong!");
         }
-        // Пример использования:
-        switch(GetUserInput())
+        /*private static void ListAirplanes(int AirplaneCount)
+       {
+           int k;
+           for (int i = 0; i<AirplaneCount; i++)
+                                   {
+                                       Console.WriteLine("НомерПП - {0};Номер рейса -{1};Пункт назначения - {2};Прибытие - {3};Авиакомпания -{4};" +
+                                       "Терминал -{5};Ворота - {6}",
+                                       airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination, airplanes[i].TimeArrival,
+                                       airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                                       k = i;
+                                   }
+       }
+       */
+
+        static void Main(string[] args)
         {
-        case ModifyInput:
-        // ....
-
-        }
-
-
-    static void Main(string[] args)
-        {
-            string Pass = "1234";
+            //string Pass = "1234";
             const int AirplaneCount = 100;
             Airplane[] airplanes = new Airplane[AirplaneCount];
             Random rnd = new Random();
@@ -135,145 +170,201 @@ namespace Airport
             {
                 airplanes[i] = new Airplane();
                 airplanes[i].SerialNumber = i + 1;
-                airplanes[i].Destination = Dest[rnd.Next(0,Dest.Length)];
-                airplanes[i].Number = rnd.Next(20,1000);
+                airplanes[i].Destination = Dest[rnd.Next(0, Dest.Length)];
+                airplanes[i].FlyNumber = rnd.Next(20, 1000);
                 airplanes[i].TimeArrival = DateTime.Now.AddMinutes(rnd.Next(1, 1440)); //-rnd.Next(1, 100);
                 airplanes[i].Aviacompany = Aviacompania[rnd.Next(0, Dest.Length)];
                 airplanes[i].Terminal = rnd.Next(1, 10);
                 airplanes[i].Gate = rnd.Next(1, 35);
-                
+
             };
-            AdminPass:
-            Console.WriteLine("Выполнить вход как\r\n1 - Администратор");
-            Console.WriteLine("2 - Полозователь");
-            int Punkt = CheckInput();
-            if (Punkt == (int)ParagraphPassword.Admin)
+            // AdminPass:
+            Console.WriteLine("Login as...\r\n1 - Admin");
+            Console.WriteLine("2 - User");
+            // int Paragraph = CheckInput();
+            ParagraphPassword input = GetUserInput<ParagraphPassword>();
+            switch (input)
             {
-                Console.Clear();
-                Console.WriteLine("Введите пароль администратора");
-                string PassTemp = Console.ReadLine();
-                if (Pass == PassTemp)
-                {
-                ProverkaAdmin:
-                    Console.Clear();
-                    Console.WriteLine("Введите пункт меню\r\n1-изменение информации по рейсу");
-                    Console.WriteLine("2-удаление рейса\r\n3-ввод нового рейса");
-                    Punkt = CheckInput();
-                    if (Pass == PassTemp)
-
-                        switch (Punkt)
+                case ParagraphPassword.AdminPass:
                     {
-                        case 1:
-                            for (int i = 0; i < AirplaneCount; i++)
-                            {
-                                Console.WriteLine("НомерПП - {0};Номер рейса -{1};Пункт назначения - {2};Прибытие - {3};Авиакомпания -{4};" +
-                                "Терминал -{5};Ворота - {6}",
-                                airplanes[i].SerialNumber, airplanes[i].NomerReisa, airplanes[i].destination, airplanes[i].VremyaPribytiya,
-                                airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
-                            }
-
-                            Console.WriteLine("Введите НомерПП интересующего рейса");
-                            int NomerPP = CheckInput("Введите доступный номерПП для рейса");
-
-                            Console.WriteLine("Вы Выбрали:");
-                            Console.WriteLine("{0};Номер рейса -{1}; Пункт назначения - {2}; Прибытие - {3}; Авиакомпания -{4};" +
-                                "Терминал -{5};Ворота - {6}",
-                                airplanes[NomerPP - 1].NomerPP, airplanes[NomerPP - 1].NomerReisa, airplanes[NomerPP - 1].destination, airplanes[NomerPP - 1].VremyaPribytiya,
-                                airplanes[NomerPP - 1].Aviacompany, airplanes[NomerPP - 1].Terminal, airplanes[NomerPP - 1].Gate);
-                            Console.WriteLine("1- Изменить пункт назначения\r\n2-Изменить Авиакомпанию");
-                            Console.WriteLine("3- Изменить Ворота\r\n4- Изменить терминал");
-                            Console.ReadLine();
-
-                            break;
-
-                        case 2:
-
-                            for (int i = 0; i < AirplaneCount; i++)
-                            {
-                                Console.WriteLine("НомерПП - {0};Номер рейса -{1};Пункт назначения - {2};Прибытие - {3};Авиакомпания -{4};" +
-                                "Терминал -{5};Ворота - {6}",
-                                airplanes[i].NomerPP, airplanes[i].NomerReisa, airplanes[i].destination, airplanes[i].VremyaPribytiya,
-                                airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
-                            }
-
-                            NomerPP = CheckInput("Введите доступный номерПП для рейса") - 1;
-                            if (NomerPP >= 0 && NomerPP < AirplaneCount)
-                            {
-                                Airplane[] airplanesNew = new Airplane[NomerPP];
-                                for (int j = 0; j < airplanes.Length; j++)
+                        Console.WriteLine("Input Admin Pass");
+                        string verifypass = CheckAdminPass();
+                        Console.Clear();
+                        Console.WriteLine("Select... \r\n1- Modify flight");
+                        Console.WriteLine("2- Delete flight\r\n3- Add flight");
+                        AdminAction admininput = GetUserInput<AdminAction>();
+                        Console.Clear();
+                        switch (admininput)
+                        {
+                            case AdminAction.Modify:
                                 {
-                                    if (j < NomerPP)
+                                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
+                                        "Terminal", "Gate");
+                                    for (int i = 0; i < AirplaneCount; i++)
                                     {
-                                        airplanesNew[j] = airplanes[j];
+                                        Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                                        airplanes[i].TimeArrival,
+                                        airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
                                     }
-                                    else if (j > NomerPP)
-                                    {
-                                        airplanesNew[j - 1] = airplanes[j];
-                                    }
+                                    Console.WriteLine("Input SerialNum");
+                                    // int Numchoise = 0;
+                                    int Numchoise = CheckInput("Insert Correct Serial");
+                                    Console.WriteLine("Insert FlyNumber and press Enter");
+                                    airplanes[Numchoise].FlyNumber = CheckInput("Insert Correct FlyNumber");
+                                    Console.WriteLine("Insert Destination and press Enter");
+                                    airplanes[Numchoise].Destination = Console.ReadLine();
+                                    Console.WriteLine("Insert Aviacompany and press Enter");
+                                    airplanes[Numchoise].Aviacompany = Console.ReadLine();
+                                    Console.WriteLine("Insert Terminal and press Enter");
+                                    airplanes[Numchoise].Terminal = CheckInput("Insert Correct Terminal");
+                                    Console.WriteLine("Insert Gate and press Enter");
+                                    airplanes[Numchoise].Gate = CheckInput("Insert Correct Gate");
+                                    
+                                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        airplanes[Numchoise].SerialNumber, airplanes[Numchoise].FlyNumber, 
+                                        airplanes[Numchoise].Destination,
+                                        airplanes[Numchoise].TimeArrival,
+                                        airplanes[Numchoise].Aviacompany, 
+                                        airplanes[Numchoise].Terminal, 
+                                        airplanes[Numchoise].Gate);
+                                    break;
                                 }
-                                var x = new CountArray(NomerPP);
-                            }
-                            else
-                            {
-                                Console.Clear();
-                                Console.WriteLine("Такого рейса не существует, выберете корректный\r\nEnter для продолжения");
-                                Console.ReadKey();
-                                goto case 2;
-                            }
-                            break;
-                        case 3:
-                            Console.WriteLine("Три");
-                            break;
-                        default:
-                            Console.WriteLine("Введите доступный пункт");
-                            goto ProverkaAdmin;
+                            case AdminAction.Delete:
+                                {
+                                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
+                                        "Terminal", "Gate");
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                                        airplanes[i].TimeArrival,
+                                        airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                                    }
+                                    Console.WriteLine("Input SerialNum");
+                                    int Numchoise = CheckInput("Insert Correct Serial");
+                                    List<string> listairportDest = new List<string>();
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        listairportDest.Add(airplanes[i].SerialNumber.ToString());
+                                    }
+                                    for (int d = 0;d < listairportDest.Count; d++)
+                                    {
+                                        if (Numchoise.ToString() == listairportDest[d])
+                                        {
+                                            listairportDest.RemoveAt(d); // listairportDest.ElementAt(d);
+                                            //listairportDest.Remove(k);
+                                        }
+                                    }
+                                    for (int d = 0; d < listairportDest.Count; d++)
+                                    {
+                                        if (Numchoise.ToString() == listairportDest[d])
+                                        {
+                                            listairportDest.RemoveAt(d);
+                                        }
+                                    }
+                                    foreach (string s in listairportDest)
+                                    {
+                                        Console.Write("{0}, ", s);
+                                    }
+                                    Console.WriteLine();
+                                    // Или двойной цикл, или метод, который не помню...
+                                    break;
+                                }
+                            case AdminAction.Add:
+                                {
+                                    Console.WriteLine("AddFlight");
+                                    break;
+                                }
+                        }
+                        break;
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Не верный пароль администратора");
-                    goto AdminPass;
-                }
-            }
-            else if (Punkt == (int)ParagraphPassword.User)
-            {
-                Console.WriteLine("Юзер");
-                Console.WriteLine("Введите пункт меню\r\n1-");
-                Console.WriteLine("2-\r\n3-");
+                case ParagraphPassword.UserPass:
+                    {
+                        Console.Clear();
+                        Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
+                                        "Terminal", "Gate");
+                        for (int i = 0; i < AirplaneCount; i++)
+                        {
+                            Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                            airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                            airplanes[i].TimeArrival,
+                            airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                        }
+                        Console.WriteLine("Select... \r\n1- Search by the Number");
+                        Console.WriteLine("2- Search by the Date\r\n3- Search by the Gate");
+                        UserAction userinput = GetUserInput<UserAction>();
+                        switch (userinput)
+                        {
+                            case UserAction.NumSearch:
+                                {
+                                    Console.WriteLine("Input FlyNumber");
+                                    int Numchoise = CheckInput("Insert Correct Serial");
+                                    Console.Clear();
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        if (Numchoise == airplanes[i].FlyNumber)
+                                        {
+                                            Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                             airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                                             airplanes[i].TimeArrival,
+                                             airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);    
+                                        }
 
-            ProverkaUser:
-                while (!int.TryParse(Console.ReadLine(), out Punkt))
-                {
-                    Console.WriteLine("Введите доступный пункт");
-                }
-                switch (Punkt)
-                {
-                    case 1:
-                        Console.WriteLine("Один");
-                        // Console.WriteLine("Введите пункт меню\r\n1-изменение информации по рейсу");
-                        break;
+                                    }
+                                    break;
+                                }
+                            case UserAction.DateSearch:
+                                {
+                                    Console.WriteLine("Input Date");
+                                    DateTime dateinput = CheckInputDateTime();
+                                    DateTime tempmaxdate = dateinput.AddHours(1);
+                                    DateTime tempmindate = dateinput.AddHours(-1);
+                                    //Console.Clear();
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        
+                                        if (tempmindate < airplanes[i].TimeArrival &&
+                                            tempmaxdate > airplanes[i].TimeArrival)
+                                        {
+                                            Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                             airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                                             airplanes[i].TimeArrival,
+                                             airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                                        }
 
-                    case 2:
-                        Console.WriteLine("Два");
+                                    }
+                                    break;
+                                }
+                            case UserAction.GateSearch:
+                                {
+                                    Console.WriteLine("Input Gate");
+                                    int Numchoise = CheckInput("Insert Correct Gate");
+                                    Console.Clear();
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        if (Numchoise == airplanes[i].Gate)
+                                        {
+                                            Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                             airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                                             airplanes[i].TimeArrival,
+                                             airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                                        }
+
+                                    }
+                                    break;
+                                }
+                        }
                         break;
-                    case 3:
-                        Console.WriteLine("Три");
-                        break;
-                    default:
-                        Console.WriteLine("Введите доступный пункт");
-                        goto ProverkaUser;
-                }
+                    }
             }
-            else
-            {
-                Console.WriteLine("Введите доступный пункт");
-                goto AdminPass;
-            }
-                    
-            }
+            Console.WriteLine("Press Enter");
             Console.ReadLine();
         }
-         
+
     }
- 
+
 }
