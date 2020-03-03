@@ -19,20 +19,7 @@ namespace Airport
         }
         class Airplane
         {
-            enum statusReisa
-            {
-                registracia,
-                posadka,
-                zakryt,
-                pribyl,
-                vylet,
-                neizvestno,
-                otmenen,
-                ozhydanie,
-                zaderzhka
-            }
-
-
+            
             DateTime startTime = new DateTime(2015, 12, 12);
             private string destination;
             private int flynumber;
@@ -41,8 +28,7 @@ namespace Airport
             private int terminal;
             private int gate;
             private int serialNumber;
-
-
+            
             public string Destination
             {
                 get { return destination; }
@@ -78,11 +64,36 @@ namespace Airport
                 get { return gate; }
                 set { gate = value; }
             }
-
+         
+            
         };
         class Person : Airplane 
         {
-            
+            private string surname;
+            private string name;
+            private int age;
+            private string passportNum;
+            public string Name
+            {
+                get { return name; }
+                set { name = value; }
+            }
+            public string Surname
+            {
+                get { return surname; }
+                set { surname = value;}
+            }
+            public int Age
+            {
+                get { return age; }
+                set { age = value; }
+            }
+            public string PassportNum
+            {
+                get { return passportNum; }
+                set { passportNum = value; }
+            }
+
         }
 
         private static int CheckInput(string str = "Insert Correct Password")
@@ -122,6 +133,11 @@ namespace Airport
             AdminPass = 1,
             UserPass = 2
         }
+        enum AddORDel
+        {
+            Add = 1,
+            Delete = 2
+        }
         enum AdminAction
         {
             Modify = 1,
@@ -144,28 +160,20 @@ namespace Airport
             }
             throw new ArgumentException("Wrong!");
         }
-        /*private static void ListAirplanes(int AirplaneCount)
-       {
-           int k;
-           for (int i = 0; i<AirplaneCount; i++)
-                                   {
-                                       Console.WriteLine("НомерПП - {0};Номер рейса -{1};Пункт назначения - {2};Прибытие - {3};Авиакомпания -{4};" +
-                                       "Терминал -{5};Ворота - {6}",
-                                       airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination, airplanes[i].TimeArrival,
-                                       airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
-                                       k = i;
-                                   }
-       }
-       */
-
+        
         static void Main(string[] args)
         {
+           
             //string Pass = "1234";
             const int AirplaneCount = 100;
+            const int PersonCount = 100;
             Airplane[] airplanes = new Airplane[AirplaneCount];
             Random rnd = new Random();
             string[] Dest = { "Киев", "Нью-Йорк", "Варшава", "Рига", "Сидней", "Антананириву", "Стокгольм", "Берлин", "Пекин" };
             string[] Aviacompania = { "Aerostar", "Anda Air", "Azur", "FANair", "SkyUp", "YanAir", "VegaAir", "UM Air", "KhorsAir" };
+            string[] Name = { "Serhii", "Andrii", "Anton", "Fedor", "Svetlana", "Yana", "Viktor", "Yurii", "Kateryna" };
+            string[] SecondName = { "Antonov(a)", "Bohovozov(a)", "", "Dyachenko", "Kotlyrov(a)", "Yanovskiy(aya)", "Melnik", "Kramarenko", "Tokaryk"};
+            List<int> FlyList = new List<int>();
             for (int i = 0; i < AirplaneCount; i++)
             {
                 airplanes[i] = new Airplane();
@@ -176,12 +184,24 @@ namespace Airport
                 airplanes[i].Aviacompany = Aviacompania[rnd.Next(0, Dest.Length)];
                 airplanes[i].Terminal = rnd.Next(1, 10);
                 airplanes[i].Gate = rnd.Next(1, 35);
-
+                FlyList.Add(airplanes[i].FlyNumber);
             };
-            // AdminPass:
+            
+            Person[] people = new Person[PersonCount];
+            for (int i = 0; i < PersonCount; i++)
+            {
+                people[i] = new Person();
+                people[i].Age = rnd.Next(18, 60);
+                people[i].Name = Name[rnd.Next(0, Name.Length)];
+                people[i].Surname = SecondName[rnd.Next(0, SecondName.Length)];
+                people[i].FlyNumber = FlyList[rnd.Next(0, FlyList.Count)];
+                char cr1 = (char)rnd.Next(0x0041, 0x005A);
+                char cr2 = (char)rnd.Next(0x0041, 0x005A);
+                people[i].PassportNum = char.ToString(cr1) + char.ToString(cr2) + string.Format("{0: 000000}",rnd.Next(0, 1000000));
+                Console.WriteLine(people[i].PassportNum); 
+            }
             Console.WriteLine("Login as...\r\n1 - Admin");
             Console.WriteLine("2 - User");
-            // int Paragraph = CheckInput();
             ParagraphPassword input = GetUserInput<ParagraphPassword>();
             switch (input)
             {
@@ -198,16 +218,8 @@ namespace Airport
                         {
                             case AdminAction.Modify:
                                 {
-                                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
-                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
-                                        "Terminal", "Gate");
-                                    for (int i = 0; i < AirplaneCount; i++)
-                                    {
-                                        Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
-                                        airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
-                                        airplanes[i].TimeArrival,
-                                        airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
-                                    }
+                                    AirplaneToConsoleAll(AirplaneCount);
+
                                     Console.WriteLine("Input SerialNum");
                                     // int Numchoise = 0;
                                     int Numchoise = CheckInput("Insert Correct Serial");
@@ -233,49 +245,64 @@ namespace Airport
                                 }
                             case AdminAction.Delete:
                                 {
-                                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
-                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
-                                        "Terminal", "Gate");
-                                    for (int i = 0; i < AirplaneCount; i++)
-                                    {
-                                        Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
-                                        airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
-                                        airplanes[i].TimeArrival,
-                                        airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
-                                    }
+                                    AirplaneToConsoleAll(AirplaneCount);
                                     Console.WriteLine("Input SerialNum");
                                     int Numchoise = CheckInput("Insert Correct Serial");
-                                    List<string> listairportDest = new List<string>();
-                                    for (int i = 0; i < AirplaneCount; i++)
+                                    Numchoise--;
+                                    if (Numchoise >= 0)
                                     {
-                                        listairportDest.Add(airplanes[i].SerialNumber.ToString());
-                                    }
-                                    for (int d = 0;d < listairportDest.Count; d++)
-                                    {
-                                        if (Numchoise.ToString() == listairportDest[d])
+                                        //AddORDel del = GetUserInput<AddORDel>();
+                                   
+                                        Airplane[] Tempairplane = new Airplane[AirplaneCount - 1];
+                                        for (int i = 0; i < Numchoise; i++)
                                         {
-                                            listairportDest.RemoveAt(d); // listairportDest.ElementAt(d);
-                                            //listairportDest.Remove(k);
+                                            Tempairplane[i] = airplanes[i];
                                         }
-                                    }
-                                    for (int d = 0; d < listairportDest.Count; d++)
-                                    {
-                                        if (Numchoise.ToString() == listairportDest[d])
+                                        for (int i = Numchoise; i < Tempairplane.Length; i++)
                                         {
-                                            listairportDest.RemoveAt(d);
+                                            Tempairplane[i] = airplanes[i + 1];
                                         }
+                                        airplanes = Tempairplane;
+                                        Console.WriteLine("New Flights is:");
+                                        AirplaneToConsoleAll(airplanes.Length);
                                     }
-                                    foreach (string s in listairportDest)
+                                    else
                                     {
-                                        Console.Write("{0}, ", s);
+                                        Console.WriteLine("Incorrect Serial");
                                     }
-                                    Console.WriteLine();
-                                    // Или двойной цикл, или метод, который не помню...
                                     break;
                                 }
                             case AdminAction.Add:
                                 {
-                                    Console.WriteLine("AddFlight");
+                                    
+                                    AirplaneToConsoleAll(AirplaneCount);
+                                    Console.WriteLine("Insert All information about Fly");
+                                    int newlen = AirplaneCount + 1;
+
+                                    // AddORDel add = GetUserInput<AddORDel>();
+                                    Airplane[] airplanes1 = new Airplane[newlen];
+                                    for (int i = 0; i < AirplaneCount; i++)
+                                    {
+                                        airplanes1[i] = new Airplane();
+                                        airplanes1[i] = airplanes[i];
+                                    }
+                                    airplanes1[newlen-1] = new Airplane();
+                                    /*    */
+                                    Console.WriteLine("Insert FlyNumber and press Enter");
+                                    airplanes1[newlen-1].FlyNumber = CheckInput("Insert Correct FlyNumber");
+                                    Console.WriteLine("Insert Destination and press Enter");
+                                    airplanes1[newlen-1].Destination = Console.ReadLine();
+                                    Console.WriteLine("Insert Aviacompany and press Enter");
+                                    airplanes1[newlen-1].Aviacompany = Console.ReadLine();
+                                    Console.WriteLine("Insert Terminal and press Enter");
+                                    airplanes1[newlen-1].Terminal = CheckInput("Insert Correct Terminal");
+                                    Console.WriteLine("Insert Gate and press Enter");
+                                    airplanes1[newlen-1].Gate = CheckInput("Insert Correct Gate");
+                                    airplanes1[newlen-1].TimeArrival = DateTime.Now.AddMinutes(rnd.Next(1, 1440));
+                                    /*   */
+                                    airplanes = airplanes1;
+                                    Console.WriteLine("New Flights is:");
+                                    AirplaneToConsoleAll(newlen);
                                     break;
                                 }
                         }
@@ -363,6 +390,68 @@ namespace Airport
             }
             Console.WriteLine("Press Enter");
             Console.ReadLine();
+            /*
+            void AddDelAirplane (int newnum, int func)
+            {
+                switch (func)
+                {
+                    case AddORDel.Delete:
+                        Airplane[] Tempairplane = new Airplane[AirplaneCount - 1];
+                        for (int i = 0; i < newnum; i++)
+                        {
+                            Tempairplane[i] = airplanes[i];
+                        }
+                        for (int i = newnum; i < Tempairplane.Length; i++)
+                        {
+                            Tempairplane[i] = airplanes[i + 1];
+                        }
+                        airplanes = Tempairplane;
+                        break;
+                    case AddORDel.Add:
+                        Airplane[] Tempairplane = new Airplane[AirplaneCount - 1];
+                        for (int i = 0; i < newnum; i++)
+                        {
+                            Tempairplane[i] = airplanes[i];
+                        }
+                        for (int i = newnum; i < Tempairplane.Length; i++)
+                        {
+                            Tempairplane[i] = airplanes[i + 1];
+                        }
+                        break;
+
+                }
+                Console.WriteLine("New Flights is:");
+                AirplaneToConsoleAll(airplanes.Length);
+            }
+            */
+            /*
+            void ChangeAirplane(int AirCount)
+            {
+                Console.WriteLine("Insert FlyNumber and press Enter");
+                airplanes[AirCount].FlyNumber = CheckInput("Insert Correct FlyNumber");
+                Console.WriteLine("Insert Destination and press Enter");
+                airplanes[AirCount].Destination = Console.ReadLine();
+                Console.WriteLine("Insert Aviacompany and press Enter");
+                airplanes[AirCount].Aviacompany = Console.ReadLine();
+                Console.WriteLine("Insert Terminal and press Enter");
+                airplanes[AirCount].Terminal = CheckInput("Insert Correct Terminal");
+                Console.WriteLine("Insert Gate and press Enter");
+                airplanes[AirCount].Gate = CheckInput("Insert Correct Gate");
+            }
+            */
+            void AirplaneToConsoleAll(int AirCount)
+            {
+                Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                                        "Serial", "FlyNumber", "Destination", "TimeArrival", "Aviacompany",
+                                        "Terminal", "Gate");
+                for (int i = 0; i < AirCount; i++)
+                {
+                    Console.WriteLine("{0,-10}| {1,-10}| {2,-20}| {3,-20}| {4,-10}| {5,-10}| {6,-10}",
+                    airplanes[i].SerialNumber, airplanes[i].FlyNumber, airplanes[i].Destination,
+                    airplanes[i].TimeArrival,
+                    airplanes[i].Aviacompany, airplanes[i].Terminal, airplanes[i].Gate);
+                }
+            }
         }
 
     }
